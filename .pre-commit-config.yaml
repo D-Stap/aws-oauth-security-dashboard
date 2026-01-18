@@ -54,9 +54,8 @@ repos:
         # You can generate the baseline via:
         # detect-secrets scan > .secrets.baseline
 
-   # Uncomment this block when Terraform files are added
-# - repo: https://github.com/antonbabenko/pre-commit-terraform
-#   rev: v1.93.2
-#   hooks:
-#     - id: terraform_fmt
-#     - id: terraform_validate
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.92.0
+    hooks:
+     - id: terraform_fmt
+     - id: terraform_validate
