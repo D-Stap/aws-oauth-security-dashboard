@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - OAuth Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h2><i class="fas fa-user"></i> User Profile</h2>
+        <p class="text-muted">Information retrieved from Cognito UserInfo endpoint</p>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-user-circle fa-5x text-primary mb-3"></i>
+                        <h5>{{ user.get('name', user.get('given_name', 'User')) }}</h5>
+                        <p class="text-muted">{{ user.get('email', 'No email') }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <h6>Profile Details</h6>
+                        <table class="table">
+                            {% for key, value in user.items() %}
+                            <tr>
+                                <td><strong>{{ key.replace('_', ' ').title() }}:</strong></td>
+                                <td>{{ value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

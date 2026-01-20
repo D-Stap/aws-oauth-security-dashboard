@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="text-center mb-5">
+            <h1 class="display-4">
+                <i class="fas fa-shield-alt text-primary"></i>
+                OAuth Security Dashboard
+            </h1>
+            <p class="lead">OAuth2 + OIDC Security Implementation with AWS Cognito</p>
+        </div>
+
+        {% if user %}
+            <!-- Logged in state -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Welcome back, {{ user.get('name', user.get('email', 'User')) }}!</h5>
+                    <p class="card-text">You are successfully authenticated via OAuth2.</p>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-primary">
+                        <i class="fas fa-tachometer-alt"></i> Go to Dashboard
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Not logged in state -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-lock text-warning"></i> Authentication Demo
+                            </h5>
+                            <p class="card-text">
+                                This application implements secure authentication using industry-standard OAuth2. 
+                                It uses the same security protocols as Google, Microsoft, and other major platforms.
+                            </p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Secure login flow (OAuth2)</li>
+                                <li><i class="fas fa-check text-success"></i> Attack prevention (PKCE)</li>
+                                <li><i class="fas fa-check text-success"></i> Identity verification (JWT)</li>
+                                <li><i class="fas fa-check text-success"></i> Session protection</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">
+                                <i class="fas fa-sign-in-alt text-primary"></i> Get Started
+                            </h5>
+                            <p class="card-text">
+                                Experience secure authentication and explore the security controls implemented behind the scenes.
+                            </p>
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt"></i> Sign In Securely
+                            </a>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    Powered by AWS Cognito
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="fas fa-info-circle"></i> How It Works
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <i class="fas fa-play-circle fa-2x text-primary"></i>
+                                </div>
+                                <h6>1. Initiate Login</h6>
+                                <small>Application redirects to secure login page</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <i class="fas fa-user-check fa-2x text-success"></i>
+                                </div>
+                                <h6>2. Authenticate</h6>
+                                <small>User enters credentials securely</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <i class="fas fa-exchange-alt fa-2x text-warning"></i>
+                                </div>
+                                <h6>3. Token Exchange</h6>
+                                <small>System creates secure access tokens</small>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <i class="fas fa-tachometer-alt fa-2x text-info"></i>
+                                </div>
+                                <h6>4. Access Granted</h6>
+                                <small>User is authenticated and can access dashboard</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Security Analysis - OAuth Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-shield-alt"></i> Security Analysis</h2>
+        <p class="text-muted">Security controls implemented to protect authentication and prevent attacks</p>
+    </div>
+</div>
+
+<!-- State + Nonce Integrity -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-random"></i> Attack Prevention</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Protection Status</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>CSRF Protection:</strong></td>
+                                <td>
+                                    {% if session_info.oauth_state_cleared %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Checking</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Code Theft Protection:</strong></td>
+                                <td>
+                                    {% if session_info.code_verifier_cleared %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Checking</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Session Security:</strong></td>
+                                <td><span class="badge bg-info">{{ session_info.secure_cookies }}</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Security Controls</h6>
+                        <ul class="small">
+                            <li><strong>CSRF Protection:</strong> Prevents malicious websites from hijacking login sessions</li>
+                            <li><strong>Code Theft Protection:</strong> PKCE ensures stolen authorization codes are useless without the verifier</li>
+                            <li><strong>Session Security:</strong> Login sessions protected from common web-based attacks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RBAC from Cognito Groups -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-users-cog"></i> Access Control</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Current Access Level</h6>
+                        {% if user_groups %}
+                            {% for group in user_groups %}
+                                <span class="badge bg-primary me-2">{{ group }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="badge bg-secondary">Standard User</span>
+                        {% endif %}
+                        
+                        <div class="mt-3">
+                            <h6>Available Roles</h6>
+                            <ul class="small">
+                                <li><strong>SecurityEngineer:</strong> Full security access</li>
+                                <li><strong>Developer:</strong> Development tools access</li>
+                                <li><strong>ReadOnly:</strong> View-only access</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Access Control Implementation</h6>
+                        <div class="small">
+                            <p><strong>Source:</strong> User groups retrieved from AWS Cognito</p>
+                            <p><strong>Security:</strong> Group membership verified with each request</p>
+                            <p><strong>Principle:</strong> Least privilege access - users receive minimum necessary permissions</p>
+                        </div>
+                        
+                        {% if user_groups %}
+                        <div class="alert alert-info small mt-2">
+                            <strong>Current Access:</strong> User has access to features for {{ user_groups|join(', ') }} role(s).
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Session Security -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-cookie-bite"></i> Secure Session Handling</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Session Configuration</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Session Timeout:</strong></td>
+                                <td>{{ session_info.session_timeout }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Secure Cookies:</strong></td>
+                                <td>{{ session_info.secure_cookies }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>HttpOnly:</strong></td>
+                                <td>Enabled (prevents XSS access)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SameSite:</strong></td>
+                                <td>Strict (CSRF protection)</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Session Security Controls</h6>
+                        <ul class="small">
+                            <li><strong>Token Refresh:</strong> Access tokens expire in 60 minutes, refresh tokens in 12 hours</li>
+                            <li><strong>Session Logout:</strong> Logout clears both local session and Cognito session</li>
+                            <li><strong>HTTPS Only:</strong> All cookies marked secure in production environment</li>
+                            <li><strong>Server Storage:</strong> Tokens stored server-side, never in browser storage</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Real-time Security Demo -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-eye"></i> Live Security Monitoring</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Current Session Status</h6>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-check-circle"></i> <strong>Session Active:</strong> Authenticated via OAuth2 + OIDC
+                        </div>
+                        <div class="alert alert-info small">
+                            <i class="fas fa-clock"></i> <strong>Token Status:</strong> Access token valid, auto-refresh enabled
+                        </div>
+                        {% if user_groups %}
+                        <div class="alert alert-primary small">
+                            <i class="fas fa-users"></i> <strong>Access Level:</strong> {{ user_groups|join(', ') }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Active Security Controls</h6>
+                        <ul class="list-unstyled small">
+                            <li><i class="fas fa-check text-success"></i> HTTPS encryption enforced</li>
+                            <li><i class="fas fa-check text-success"></i> PKCE code challenge validated</li>
+                            <li><i class="fas fa-check text-success"></i> State parameter verified</li>
+                            <li><i class="fas fa-check text-success"></i> JWT signature validated</li>
+                            <li><i class="fas fa-check text-success"></i> Session cookies secured</li>
+                            <li><i class="fas fa-check text-success"></i> RBAC permissions applied</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Handling Demo -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exclamation-triangle"></i> Error Handling & Failure Paths</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Error Handling Scenarios</h6>
+                        <ul class="small">
+                            <li><strong>Invalid State Parameter:</strong> Redirects to home with CSRF warning</li>
+                            <li><strong>Authorization Denied:</strong> Displays user-friendly error message</li>
+                            <li><strong>Token Exchange Failure:</strong> Logs error, prompts retry</li>
+                            <li><strong>Expired Tokens:</strong> Automatic refresh or re-authentication required</li>
+                            <li><strong>Invalid Redirect URI:</strong> Cognito blocks with error page</li>
+                            <li><strong>Missing Required Scopes:</strong> Graceful degradation with reduced functionality</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Security-First Error Handling</h6>
+                        <div class="small">
+                            <p><strong>Information Protection:</strong> Generic error messages for users, detailed logs for administrators</p>
+                            <p><strong>Fail Secure:</strong> Authentication failures default to denying access</p>
+                            <p><strong>Audit Trail:</strong> All authentication events logged for security monitoring</p>
+                            <p><strong>Rate Limiting:</strong> Cognito provides built-in protection against brute force attacks</p>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-warning" onclick="testErrorPath('csrf')">
+                                    <i class="fas fa-shield-alt"></i> Test CSRF Protection
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="testErrorPath('token')">
+                                    <i class="fas fa-key"></i> Test Token Error
+                                </button>
+                                <button class="btn btn-sm btn-outline-info" onclick="testErrorPath('expired')">
+                                    <i class="fas fa-clock"></i> Test Session Expiry
+                                </button>
+                            </div>
+                            <small class="text-muted d-block mt-2">Tests secure error handling and fail-safe behavior</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <a href="{{ url_for('dashboard.docs') }}" class="btn btn-primary">
+        <i class="fas fa-book"></i> View Documentation
+    </a>
+</div>
+
+<script>
+function testErrorPath(errorType) {
+    if (!errorType) errorType = 'csrf';
+    
+    // Show loading state
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
+    button.disabled = true;
+    
+    // Simulate error condition
+    window.location.href = `/auth/test-error?type=${errorType}`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Tokens - OAuth Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-key"></i> Token Information</h2>
+        <p class="text-muted">OAuth2 tokens and their decoded contents</p>
+    </div>
+</div>
+
+{% for token_type in ['access_token', 'id_token'] %}
+{% if tokens.get(token_type) %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-{{ 'key' if token_type == 'access_token' else 'id-card' }}"></i>
+                    {{ token_type.replace('_', ' ').title() }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Raw Token -->
+                <h6>Raw Token:</h6>
+                <div class="bg-light p-3 mb-3" style="font-family: monospace; word-break: break-all; font-size: 0.8em;">
+                    {{ tokens[token_type] }}
+                </div>
+
+                <!-- Decoded Token -->
+                {% if decoded_tokens.get(token_type) %}
+                <h6>Decoded Claims:</h6>
+                {% if decoded_tokens[token_type] is string %}
+                    <div class="alert alert-danger">{{ decoded_tokens[token_type] }}</div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            {% for key, value in decoded_tokens[token_type].items() %}
+                            <tr>
+                                <td><strong>{{ key }}:</strong></td>
+                                <td>
+                                    {% if key in ['iat', 'exp', 'auth_time'] and value is number %}
+                                        {{ value }} 
+                                        <small class="text-muted">
+                                            ({{ value | int | timestamp_to_date if value else 'Invalid' }})
+                                        </small>
+                                    {% elif key == 'aud' and value is iterable and value is not string %}
+                                        {{ value | join(', ') }}
+                                    {% else %}
+                                        {{ value }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
+{% if tokens.get('refresh_token') %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-sync-alt"></i> Refresh Token
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Security Notice:</strong> Refresh tokens are highly sensitive and should never be displayed or logged.
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Token Status</h6>
+                        <table class="table table-sm">
+                            <tr>
+                                <td><strong>Present:</strong></td>
+                                <td><span class="badge bg-success">Available</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Length:</strong></td>
+                                <td>{{ tokens.refresh_token|length }} characters</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Storage:</strong></td>
+                                <td>Server-side session (secure)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Lifetime:</strong></td>
+                                <td>12 hours</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Security Properties</h6>
+                        <ul class="small">
+                            <li><strong>Opaque Token:</strong> Cannot be decoded (not JWT)</li>
+                            <li><strong>Single Use:</strong> Invalidated after each refresh</li>
+                            <li><strong>Secure Storage:</strong> Never sent to client-side JavaScript</li>
+                            <li><strong>Rotation:</strong> New refresh token issued with each use</li>
+                            <li><strong>Revocation:</strong> Can be revoked by Cognito if compromised</li>
+                        </ul>
+                        
+                        <div class="mt-3">
+                            <div class="bg-light p-3 rounded">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle"></i> 
+                                    <strong>Why Hidden:</strong> Refresh tokens provide long-term access and should be treated like passwords. 
+                                    Displaying them would create security risks including token theft and replay attacks.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Token Security Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-key text-primary"></i> Access Token</h6>
+                        <ul class="small">
+                            <li><strong>Purpose:</strong> API access authorization</li>
+                            <li><strong>Lifetime:</strong> Short (60 minutes)</li>
+                            <li><strong>Format:</strong> JWT (can be decoded)</li>
+                            <li><strong>Security:</strong> Safe to inspect for debugging</li>
+                            <li><strong>Scope:</strong> Limited permissions only</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-id-card text-success"></i> ID Token</h6>
+                        <ul class="small">
+                            <li><strong>Purpose:</strong> User identity information</li>
+                            <li><strong>Lifetime:</strong> Short (60 minutes)</li>
+                            <li><strong>Format:</strong> JWT with user claims</li>
+                            <li><strong>Security:</strong> Safe to decode for user info</li>
+                            <li><strong>Usage:</strong> Authentication, not authorization</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h6><i class="fas fa-sync-alt text-warning"></i> Refresh Token</h6>
+                        <ul class="small">
+                            <li><strong>Purpose:</strong> Obtain new access tokens</li>
+                            <li><strong>Lifetime:</strong> Long (12 hours)</li>
+                            <li><strong>Format:</strong> Opaque (cannot decode)</li>
+                            <li><strong>Security:</strong> <span class="text-danger">NEVER display or log</span></li>
+                            <li><strong>Risk:</strong> Equivalent to long-term password</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    <strong>Security Best Practice:</strong> 
+                    Refresh tokens should be treated as highly sensitive credentials. They provide long-term access 
+                    and should never be displayed in UIs, logged, or transmitted to client-side code.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - OAuth Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+        <p class="text-muted">OAuth2 authentication successful. User information and security status displayed below.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- User Info Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-user"></i> User Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Email:</strong></td>
+                        <td>{{ user.get('email', 'N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Name:</strong></td>
+                        <td>{{ user.get('name', user.get('given_name', 'N/A')) }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Username:</strong></td>
+                        <td>{{ user.get('username', user.get('cognito:username', 'N/A')) }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Email Verified:</strong></td>
+                        <td>
+                            {% if user.get('email_verified') %}
+                                <span class="badge bg-success">Yes</span>
+                            {% else %}
+                                <span class="badge bg-warning">No</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Info Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-key"></i> Authentication Details</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr>
+                        <td><strong>Access Token:</strong></td>
+                        <td>
+                            {% if tokens.get('access_token') %}
+                                <span class="badge bg-success">Present</span>
+                            {% else %}
+                                <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>ID Token:</strong></td>
+                        <td>
+                            {% if tokens.get('id_token') %}
+                                <span class="badge bg-success">Present</span>
+                            {% else %}
+                                <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Refresh Token:</strong></td>
+                        <td>
+                            {% if tokens.get('refresh_token') %}
+                                <span class="badge bg-warning">Present (Hidden for Security)</span>
+                            {% else %}
+                                <span class="badge bg-danger">Missing</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Token Type:</strong></td>
+                        <td>{{ tokens.get('token_type', 'N/A') }}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Expires In:</strong></td>
+                        <td>{{ tokens.get('expires_in', 'N/A') }} seconds</td>
+                    </tr>
+                </table>
+                <a href="{{ url_for('dashboard.tokens') }}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-eye"></i> View Technical Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if id_token_decoded %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-id-card"></i> ID Token Claims</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        {% for key, value in id_token_decoded.items() %}
+                        <tr>
+                            <td><strong>{{ key }}:</strong></td>
+                            <td>
+                                {% if key in ['iat', 'exp', 'auth_time'] %}
+                                    {{ value }} ({{ value | int | timestamp_to_date if value else 'N/A' }})
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Security Status Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="fas fa-lock fa-3x text-success mb-2"></i>
+                            <h6>PKCE Protection</h6>
+                            <small class="text-muted">Authorization code interception prevented</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="fas fa-random fa-3x text-primary mb-2"></i>
+                            <h6>CSRF Protection</h6>
+                            <small class="text-muted">State parameter validation active</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="fas fa-users-cog fa-3x text-info mb-2"></i>
+                            <h6>RBAC Enabled</h6>
+                            <small class="text-muted">Group-based access control from Cognito</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <i class="fas fa-cookie-bite fa-3x text-warning mb-2"></i>
+                            <h6>Secure Sessions</h6>
+                            <small class="text-muted">HttpOnly, Secure, SameSite cookies</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('dashboard.security') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-shield-alt"></i> View Detailed Security Analysis
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
