@@ -1,1 +1,30 @@
-core-infra/terraform/.terraform/\ncore-infra/terraform/terraform.tfstate*
+core-infra/terraform/.terraform/
+core-infra/terraform/terraform.tfstate*
+
+# Environment files containing secrets
+.env
+app/.env
+**/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

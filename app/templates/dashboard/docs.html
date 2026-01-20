@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Documentation - OAuth Security Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-book"></i> Implementation Documentation</h2>
+        <p class="text-muted">OAuth2 + OIDC security implementation with AWS Cognito</p>
+    </div>
+</div>
+
+<!-- Architecture Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-sitemap"></i> Architecture Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="text-center mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="border rounded p-3 bg-light">
+                                    <i class="fas fa-globe fa-2x text-primary"></i>
+                                    <div><strong>Browser</strong></div>
+                                    <small>User Agent</small>
+                                </div>
+                                <div class="mx-2">
+                                    <i class="fas fa-arrow-right text-success"></i>
+                                    <div class="small">HTTPS</div>
+                                </div>
+                                <div class="border rounded p-3 bg-light">
+                                    <i class="fas fa-server fa-2x text-info"></i>
+                                    <div><strong>Flask App</strong></div>
+                                    <small>OAuth Client</small>
+                                </div>
+                                <div class="mx-2">
+                                    <i class="fas fa-arrow-right text-warning"></i>
+                                    <div class="small">OAuth2</div>
+                                </div>
+                                <div class="border rounded p-3 bg-light">
+                                    <i class="fas fa-shield-alt fa-2x text-danger"></i>
+                                    <div><strong>Cognito</strong></div>
+                                    <small>Auth Server</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info small">
+                            <strong>Authentication Flow:</strong> Browser initiates login -> Flask redirects to Cognito -> User authenticates -> Cognito returns authorization code -> Flask exchanges code for tokens -> Session established
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>Security Artifact Storage</h6>
+                        <ul class="small">
+                            <li><strong>State Parameter:</strong> Flask session (temporary)</li>
+                            <li><strong>PKCE Verifier:</strong> Flask session (temporary)</li>
+                            <li><strong>PKCE Challenge:</strong> Cognito authorization request</li>
+                            <li><strong>Session Cookies:</strong> Browser (HttpOnly, Secure)</li>
+                            <li><strong>JWT Tokens:</strong> Flask session (server-side)</li>
+                            <li><strong>User Information:</strong> Flask session + ID token claims</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OAuth2 Flow Breakdown -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-exchange-alt"></i> OAuth2 / OIDC Flow Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="badge bg-primary rounded-circle me-3" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">1</div>
+                                <h6 class="mb-0">Authorization Request</h6>
+                            </div>
+                            <div class="ms-5">
+                                <p class="small mb-1"><strong>Action:</strong> Build authorization request with security parameters</p>
+                                <ul class="small">
+                                    <li><strong>Scopes:</strong> <code>openid email profile</code></li>
+                                    <li><strong>State:</strong> Random CSRF protection token</li>
+                                    <li><strong>Code Challenge:</strong> SHA256 hash of PKCE verifier</li>
+                                    <li><strong>Response Type:</strong> <code>code</code> (Authorization Code flow)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="badge bg-success rounded-circle me-3" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">2</div>
+                                <h6 class="mb-0">User Authentication</h6>
+                            </div>
+                            <div class="ms-5">
+                                <p class="small mb-1"><strong>Action:</strong> Cognito Hosted UI handles user authentication</p>
+                                <ul class="small">
+                                    <li><strong>MFA:</strong> Optional multi-factor authentication</li>
+                                    <li><strong>Password Policy:</strong> 12+ chars, complexity requirements</li>
+                                    <li><strong>Account Recovery:</strong> Email-based password reset</li>
+                                    <li><strong>Brute Force Protection:</strong> Built-in rate limiting</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="badge bg-warning rounded-circle me-3" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">3</div>
+                                <h6 class="mb-0">Token Exchange</h6>
+                            </div>
+                            <div class="ms-5">
+                                <p class="small mb-1"><strong>Action:</strong> Exchange authorization code for tokens</p>
+                                <ul class="small">
+                                    <li><strong>Authorization Code:</strong> Single-use, short-lived</li>
+                                    <li><strong>PKCE Verifier:</strong> Proves client identity</li>
+                                    <li><strong>Access Token:</strong> API access (60 min lifetime)</li>
+                                    <li><strong>ID Token:</strong> User identity (JWT with claims)</li>
+                                    <li><strong>Refresh Token:</strong> Token renewal (12 hour lifetime)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="badge bg-info rounded-circle me-3" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">4</div>
+                                <h6 class="mb-0">Session Creation</h6>
+                            </div>
+                            <div class="ms-5">
+                                <p class="small mb-1"><strong>Action:</strong> Validate tokens and create secure session</p>
+                                <ul class="small">
+                                    <li><strong>JWT Validation:</strong> Signature, expiry, and issuer verification</li>
+                                    <li><strong>User Info Extraction:</strong> Claims extracted from ID token</li>
+                                    <li><strong>RBAC Setup:</strong> Group membership retrieved from Cognito</li>
+                                    <li><strong>Session Security:</strong> HttpOnly, Secure, SameSite cookies</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Threat Model & Mitigations -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bug"></i> Threat Model & Security Mitigations</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Authorization Code Interception</h6>
+                        <p class="small"><strong>Threat:</strong> Attacker intercepts authorization code during redirect</p>
+                        <p class="small"><strong>Mitigation:</strong> PKCE (Proof Key for Code Exchange) - code is useless without the verifier</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - PKCE implemented
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Cross-Site Request Forgery (CSRF)</h6>
+                        <p class="small"><strong>Threat:</strong> Malicious site tricks user into unwanted authentication</p>
+                        <p class="small"><strong>Mitigation:</strong> State parameter validation ensures callback matches original request</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - State validation active
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Session Hijacking</h6>
+                        <p class="small"><strong>Threat:</strong> Attacker steals session cookies to impersonate user</p>
+                        <p class="small"><strong>Mitigation:</strong> Secure, HttpOnly, SameSite cookies + HTTPS only</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - Secure session handling
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Token Replay Attacks</h6>
+                        <p class="small"><strong>Threat:</strong> Stolen tokens used to gain unauthorized access</p>
+                        <p class="small"><strong>Mitigation:</strong> Short token lifetimes + automatic refresh + secure storage</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - 60min token expiry
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Privilege Escalation</h6>
+                        <p class="small"><strong>Threat:</strong> User gains access beyond their authorized level</p>
+                        <p class="small"><strong>Mitigation:</strong> RBAC with Cognito groups + server-side enforcement</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - Group-based access control
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6 class="text-danger">Information Disclosure</h6>
+                        <p class="small"><strong>Threat:</strong> Sensitive data exposed in logs or error messages</p>
+                        <p class="small"><strong>Mitigation:</strong> Generic error messages + secure logging practices</p>
+                        <div class="alert alert-success small">
+                            <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - Fail-secure error handling
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Implementation Notes -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-code"></i> Implementation Highlights</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Security Best Practices</h6>
+                        <ul class="small">
+                            <li><strong>Public OAuth Client:</strong> No client secret stored (PKCE provides security)</li>
+                            <li><strong>Server-Side Sessions:</strong> Tokens never exposed to client-side JavaScript</li>
+                            <li><strong>Minimal Scopes:</strong> Only request necessary permissions (openid, email, profile)</li>
+                            <li><strong>Secure Defaults:</strong> All security features enabled by default</li>
+                            <li><strong>Defense in Depth:</strong> Multiple layers of security controls</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Production Considerations</h6>
+                        <ul class="small">
+                            <li><strong>HTTPS Everywhere:</strong> All communication encrypted in transit</li>
+                            <li><strong>Token Rotation:</strong> Automatic refresh before expiration</li>
+                            <li><strong>Audit Logging:</strong> All authentication events logged</li>
+                            <li><strong>Rate Limiting:</strong> Cognito provides built-in DDoS protection</li>
+                            <li><strong>Monitoring:</strong> CloudWatch integration for security alerts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('dashboard.index') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <a href="{{ url_for('dashboard.security') }}" class="btn btn-primary">
+        <i class="fas fa-shield-alt"></i> View Security Analysis
+    </a>
+</div>
+{% endblock %}
