@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="alert alert-info small">
                             <strong>Authentication Flow:</strong> Browser initiates login -> Flask redirects to Cognito -> User authenticates -> Cognito returns authorization code -> Flask exchanges code for tokens -> Session established
                         </div>
@@ -111,7 +111,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="col-md-6">
                         <div class="mb-4">
                             <div class="d-flex align-items-center mb-2">
@@ -169,7 +169,7 @@
                             <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - PKCE implemented
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <h6 class="text-danger">Cross-Site Request Forgery (CSRF)</h6>
                         <p class="small"><strong>Threat:</strong> Malicious site tricks user into unwanted authentication</p>
@@ -178,7 +178,7 @@
                             <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - State validation active
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <h6 class="text-danger">Session Hijacking</h6>
                         <p class="small"><strong>Threat:</strong> Attacker steals session cookies to impersonate user</p>
@@ -188,7 +188,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row mt-3">
                     <div class="col-md-4">
                         <h6 class="text-danger">Token Replay Attacks</h6>
@@ -198,7 +198,7 @@
                             <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - 60min token expiry
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <h6 class="text-danger">Privilege Escalation</h6>
                         <p class="small"><strong>Threat:</strong> User gains access beyond their authorized level</p>
@@ -207,7 +207,7 @@
                             <i class="fas fa-shield-alt"></i> <strong>Protected</strong> - Group-based access control
                         </div>
                     </div>
-                    
+
                     <div class="col-md-4">
                         <h6 class="text-danger">Information Disclosure</h6>
                         <p class="small"><strong>Threat:</strong> Sensitive data exposed in logs or error messages</p>

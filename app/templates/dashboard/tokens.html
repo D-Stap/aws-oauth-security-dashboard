@@ -41,7 +41,7 @@
                                 <td><strong>{{ key }}:</strong></td>
                                 <td>
                                     {% if key in ['iat', 'exp', 'auth_time'] and value is number %}
-                                        {{ value }} 
+                                        {{ value }}
                                         <small class="text-muted">
                                             ({{ value | int | timestamp_to_date if value else 'Invalid' }})
                                         </small>
@@ -75,10 +75,10 @@
             </div>
             <div class="card-body">
                 <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i> 
+                    <i class="fas fa-exclamation-triangle"></i>
                     <strong>Security Notice:</strong> Refresh tokens are highly sensitive and should never be displayed or logged.
                 </div>
-                
+
                 <div class="row">
                     <div class="col-md-6">
                         <h6>Token Status</h6>
@@ -110,12 +110,12 @@
                             <li><strong>Rotation:</strong> New refresh token issued with each use</li>
                             <li><strong>Revocation:</strong> Can be revoked by Cognito if compromised</li>
                         </ul>
-                        
+
                         <div class="mt-3">
                             <div class="bg-light p-3 rounded">
                                 <small class="text-muted">
-                                    <i class="fas fa-info-circle"></i> 
-                                    <strong>Why Hidden:</strong> Refresh tokens provide long-term access and should be treated like passwords. 
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Why Hidden:</strong> Refresh tokens provide long-term access and should be treated like passwords.
                                     Displaying them would create security risks including token theft and replay attacks.
                                 </small>
                             </div>
@@ -167,11 +167,11 @@
                         </ul>
                     </div>
                 </div>
-                
+
                 <div class="alert alert-danger mt-3">
-                    <i class="fas fa-exclamation-triangle"></i> 
-                    <strong>Security Best Practice:</strong> 
-                    Refresh tokens should be treated as highly sensitive credentials. They provide long-term access 
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Security Best Practice:</strong>
+                    Refresh tokens should be treated as highly sensitive credentials. They provide long-term access
                     and should never be displayed in UIs, logged, or transmitted to client-side code.
                 </div>
             </div>

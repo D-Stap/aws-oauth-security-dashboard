@@ -1,13 +1,13 @@
 # OAuth Security Dashboard Terraform Variables
 
 # AWS Configuration
-aws_region = "us-east-1"  # Change to your preferred region
+aws_region = "us-east-1" # Change to your preferred region
 
 # Project Configuration
 project_name = "oauth-security-dashboard"
 
 # Cognito Configuration
-cognito_domain_prefix = "oauth-sec-dash-dev-12345"  # Must be unique - change the numbers
+cognito_domain_prefix = "oauth-sec-dash-dev-12345" # Must be unique - change the numbers
 
 # Application URLs (for development)
 callback_urls = [
@@ -24,6 +24,6 @@ logout_urls = [
 create_groups = true
 rbac_groups = [
   "SecurityEngineer",
-  "Developer", 
+  "Developer",
   "ReadOnly"
 ]
