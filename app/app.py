@@ -35,10 +35,7 @@ def create_app():
     # Health check
     @app.route("/health")
     def health():
-        return jsonify({
-            "status": "healthy", 
-            "service": "oauth-security-dashboard"
-        })
+        return jsonify({"status": "healthy", "service": "oauth-security-dashboard"})
 
     return app
 
