@@ -13,8 +13,7 @@ A Flask application implementing secure OAuth2 + OIDC with AWS Cognito. This pro
 
 ## Demo
 
-<!-- Replace with your actual video file -->
-![OAuth Security Dashboard Demo](assets/DemoGif.gif)
+<img src="assets/preview.gif" alt="OAuth Security Dashboard Demo" width="1000">
 
 *Complete OAuth2 authentication flow with security analysis and token management*
 
