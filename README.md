@@ -26,7 +26,6 @@ A Flask application implementing secure OAuth2 + OIDC with AWS Cognito. This pro
 - **RBAC Implementation**: Role-based access control using Cognito groups
 - **Security Analysis**: Real-time security status monitoring and threat mitigation
 - **Production Ready**: Secure session handling, HTTPS enforcement, audit logging
-
 ## Architecture
 
 ```
