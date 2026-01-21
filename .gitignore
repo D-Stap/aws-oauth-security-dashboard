@@ -1,4 +1,5 @@
 core-infra/terraform/.terraform/
+core-infra/terraform/modules/**/.terraform/
 core-infra/terraform/terraform.tfstate*
 
 # Environment files containing secrets

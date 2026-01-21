@@ -80,7 +80,7 @@
                         {% else %}
                             <span class="badge bg-secondary">Standard User</span>
                         {% endif %}
-                        
+
                         <div class="mt-3">
                             <h6>Available Roles</h6>
                             <ul class="small">
@@ -97,7 +97,7 @@
                             <p><strong>Security:</strong> Group membership verified with each request</p>
                             <p><strong>Principle:</strong> Least privilege access - users receive minimum necessary permissions</p>
                         </div>
-                        
+
                         {% if user_groups %}
                         <div class="alert alert-info small mt-2">
                             <strong>Current Access:</strong> User has access to features for {{ user_groups|join(', ') }} role(s).
@@ -223,7 +223,7 @@
                             <p><strong>Audit Trail:</strong> All authentication events logged for security monitoring</p>
                             <p><strong>Rate Limiting:</strong> Cognito provides built-in protection against brute force attacks</p>
                         </div>
-                        
+
                         <div class="mt-3">
                             <div class="btn-group" role="group">
                                 <button class="btn btn-sm btn-outline-warning" onclick="testErrorPath('csrf')">
@@ -257,13 +257,13 @@
 <script>
 function testErrorPath(errorType) {
     if (!errorType) errorType = 'csrf';
-    
+
     // Show loading state
     const button = event.target;
     const originalText = button.innerHTML;
     button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Testing...';
     button.disabled = true;
-    
+
     // Simulate error condition
     window.location.href = `/auth/test-error?type=${errorType}`;
 }
